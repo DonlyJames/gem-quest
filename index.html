@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Kingdom Restored</title>
+<meta name="description" content="A match-3 puzzle where every level you clear restores a piece of the ruined kingdom." />
+<meta name="theme-color" content="#14213D" />
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<link rel="icon" href="icon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ===== TITLE SCREEN ===== -->
+  <section id="screen-title" class="screen active">
+    <div class="title-scene">
+      <svg class="title-castle" viewBox="0 0 400 200" aria-hidden="true">
+        <rect x="0" y="150" width="400" height="50" fill="#0f1830"/>
+        <g fill="#1c2c52">
+          <rect x="60" y="90" width="30" height="60"/>
+          <rect x="55" y="75" width="8" height="15"/>
+          <rect x="70" y="75" width="8" height="15"/>
+          <rect x="85" y="75" width="8" height="15"/>
+          <rect x="280" y="80" width="34" height="70"/>
+          <rect x="275" y="65" width="8" height="15"/>
+          <rect x="292" y="65" width="8" height="15"/>
+          <rect x="309" y="65" width="8" height="15"/>
+          <rect x="150" y="60" width="100" height="90"/>
+          <polygon points="150,60 200,20 250,60"/>
+          <rect x="120" y="100" width="20" height="50"/>
+          <rect x="260" y="100" width="20" height="50"/>
+        </g>
+        <circle cx="200" cy="35" r="4" fill="#C9A227"/>
+      </svg>
+    </div>
+    <div class="title-copy">
+      <p class="eyebrow">a restoration puzzle</p>
+      <h1>Kingdom<br/>Restored</h1>
+      <p class="tagline">Match the relics. Rebuild the realm, one ruin at a time.</p>
+    </div>
+    <button class="btn btn-primary btn-big" id="btn-play">Enter the Kingdom</button>
+    <button class="btn btn-ghost" id="btn-reset-progress">Reset progress</button>
+  </section>
+
+  <!-- ===== KINGDOM MAP ===== -->
+  <section id="screen-map" class="screen">
+    <header class="topbar">
+      <div class="stat-pill">
+        <svg viewBox="0 0 24 24" class="icon-star"><path d="M12 2l2.9 6.6L22 9.3l-5.2 4.7L18.2 21 12 17.3 5.8 21l1.4-7-5.2-4.7 7.1-.7z"/></svg>
+        <span id="star-total">0</span>
+      </div>
+      <h2 class="map-title">The Realm</h2>
+      <div class="stat-pill stat-pill-ghost" id="map-progress-pill">0 / 0 restored</div>
+    </header>
+    <div class="map-scroll" id="map-scroll">
+      <svg id="map-backdrop" viewBox="0 0 400 1400" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+        <defs>
+          <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1b2a4a"/>
+            <stop offset="100%" stop-color="#0e1526"/>
+          </linearGradient>
+        </defs>
+        <rect x="0" y="0" width="400" height="1400" fill="url(#skyGrad)"/>
+        <path d="M0,1400 C60,1300 40,1200 90,1120 C140,1040 60,960 110,880 C160,800 70,720 120,640 C170,560 80,480 130,400 C180,320 90,240 150,160 C190,100 260,60 400,40 L400,1400 Z" fill="#141f3a" opacity="0.6"/>
+      </svg>
+      <div class="map-path" id="map-path"></div>
+    </div>
+  </section>
+
+  <!-- ===== LEVEL INTRO MODAL ===== -->
+  <div id="modal-level" class="modal-overlay">
+    <div class="modal-card">
+      <p class="eyebrow" id="level-modal-eyebrow">Level 1</p>
+      <h3 id="level-modal-title">Clear the Rubble</h3>
+      <div class="goal-row" id="level-modal-goals"></div>
+      <p class="modal-sub" id="level-modal-moves">18 moves</p>
+      <button class="btn btn-primary" id="btn-start-level">Begin</button>
+      <button class="btn btn-ghost" id="btn-cancel-level">Back to map</button>
+    </div>
+  </div>
+
+  <!-- ===== GAME SCREEN ===== -->
+  <section id="screen-game" class="screen">
+    <header class="game-topbar">
+      <button class="icon-btn" id="btn-quit-game" aria-label="Back to map">
+        <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="game-topbar-mid">
+        <span class="level-badge" id="game-level-label">Level 1</span>
+        <div class="goal-row goal-row-compact" id="game-goals"></div>
+      </div>
+      <div class="moves-pill">
+        <span id="moves-left">18</span>
+        <small>moves</small>
+      </div>
+    </header>
+    <div class="board-wrap">
+      <div id="board" class="board"></div>
+    </div>
+    <div class="progress-track">
+      <div class="progress-track-fill" id="progress-fill"></div>
+    </div>
+  </section>
+
+  <!-- ===== WIN / LOSE MODAL ===== -->
+  <div id="modal-result" class="modal-overlay">
+    <div class="modal-card modal-result">
+      <div id="result-icon" class="result-icon"></div>
+      <h3 id="result-title">Restored!</h3>
+      <p class="modal-sub" id="result-sub">The old chapel stands again.</p>
+      <div class="stars-row" id="stars-row">
+        <svg viewBox="0 0 24 24" class="star-big"><path d="M12 2l2.9 6.6L22 9.3l-5.2 4.7L18.2 21 12 17.3 5.8 21l1.4-7-5.2-4.7 7.1-.7z"/></svg>
+        <svg viewBox="0 0 24 24" class="star-big"><path d="M12 2l2.9 6.6L22 9.3l-5.2 4.7L18.2 21 12 17.3 5.8 21l1.4-7-5.2-4.7 7.1-.7z"/></svg>
+        <svg viewBox="0 0 24 24" class="star-big"><path d="M12 2l2.9 6.6L22 9.3l-5.2 4.7L18.2 21 12 17.3 5.8 21l1.4-7-5.2-4.7 7.1-.7z"/></svg>
+      </div>
+      <button class="btn btn-primary" id="btn-result-primary">Continue</button>
+      <button class="btn btn-ghost" id="btn-result-secondary">Retry</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+</div>
+
+<script src="game.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
